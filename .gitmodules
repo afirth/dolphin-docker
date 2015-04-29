@@ -1,3 +1,12 @@
 [submodule "dolphin-tools"]
 	path = dolphin-tools
 	url = https://github.com/UMMS-Biocore/dolphin-tools
+[submodule "dolphin-ui"]
+	path = dolphin-ui
+	url = https://github.com/UMMS-Biocore/dolphin-ui
+[submodule "dolphin-webservice"]
+	path = dolphin-webservice
+	url = https://github.com/UMMS-Biocore/dolphin-webservice
+[submodule "bin/dolphin-bin"]
+	path = bin/dolphin-bin
+	url = https://github.com/UMMS-Biocore/dolphin-bin
