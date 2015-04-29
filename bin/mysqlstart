@@ -1,0 +1,17 @@
+#!/bin/bash
+
+service mysql start
+
+mysql -uroot -e "CREATE USER 'bioinfo'@'localhost' IDENTIFIED BY 'bioinfo2013';"
+mysql -uroot -e "CREATE USER 'bioinfo'@'%' IDENTIFIED BY 'bioinfo2013';"
+mysql -uroot -e "GRANT ALL PRIVILEGES on *.* TO 'bioinfo'@'localhost' IDENTIFIED BY 'bioinfo2013' WITH GRANT OPTION;"
+mysql -uroot -e "GRANT ALL PRIVILEGES on *.* TO 'bioinfo'@'%' IDENTIFIED BY 'bioinfo2013' WITH GRANT OPTION;"
+mysql -uroot -e "SET PASSWORD FOR 'debian-sys-maint'@'localhost'  = PASSWORD('wyWfii441QirT2N8');"
+
+
+mysql -uroot < /var/www/html/dolphin/db/alldb_28Apr2015.sql 
+service mysqld stop
+
+
+
+
