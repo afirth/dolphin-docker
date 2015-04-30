@@ -6,10 +6,9 @@ RUN apt-get update
 RUN apt-get -y upgrade
  
 # Install apache, PHP, and supplimentary programs. curl and lynx-cur are for debugging the container.
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install apache2 libapache2-mod-php5 php5-mysqlnd php5-gd php-pear php-apc php5-curl curl lynx-cur mysql-server libreadline-dev libsqlite3-dev libbz2-dev libssl-dev python python-dev libmysqlclient-dev python-pip
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install apache2 libapache2-mod-php5 php5-mysqlnd php5-gd php-pear php-apc php5-curl curl lynx-cur mysql-server libreadline-dev libsqlite3-dev libbz2-dev libssl-dev python python-dev libmysqlclient-dev python-pip git
 
 RUN pip install MySQL-python
-
 
 # Enable apache mods.
 RUN a2enmod php5
@@ -32,13 +31,12 @@ EXPOSE 3306
 
 
 # Copy site into place.
-ADD dolphin_ui /var/www/html/dolphin
-ADD dolphin_webservice /var/www/html/dolphin_webservice
+ADD dolphin-ui /var/www/html/dolphin
+ADD dolphin-webservice /var/www/html/dolphin_webservice
 ADD bin  /usr/local/bin
-ADD dolphin_tools ${DOLPHIN_TOOLS_PATH}
-ADD genome_data /tmp/genome_data
+ADD dolphin-tools ${DOLPHIN_TOOLS_PATH}
 
-RUN cd /usr/local/bin/dolphin_bin/ZSI-2.1-a1 && python setup.py install
+RUN cd /usr/local/bin/dolphin-bin/ZSI-2.1-a1 && python setup.py install
 
 # Update the default apache site with the config we created.
 ADD apache-config.conf /etc/apache2/sites-enabled/000-default.conf

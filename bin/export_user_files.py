@@ -43,9 +43,7 @@ if __name__ == "__main__":
 
     if os.path.exists('/export/'):
         if not os.path.exists( GENOME_DATA_DIR ):
-            subprocess.call('mv /tmp/genome_data %s' % (GENOME_DATA_DIR), shell=True)
-        else:
-            subprocess.call('rm -rf /tmp/genome_data', shell=True)
+            subprocess.call('git clone https://github.com/UMMS-Biocore/dolphin-genome-data.git %s' % (GENOME_DATA_DIR), shell=True)
 
       #For mysql db
         if not os.path.exists( MYSQL_DATA_DIR_HOST ):
