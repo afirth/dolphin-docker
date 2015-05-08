@@ -18,14 +18,13 @@ RUN pip install MySQL-python
 RUN a2enmod php5
 RUN a2enmod rewrite
 
-#Install DESeq2 
-#RUN R -e 'source("http://bioconductor.org/biocLite.R"); biocLite("DESeq2");'
 
 # Update the PHP.ini file, enable <? ?> tags and quieten logging.
 RUN sed -i "s/short_open_tag = Off/short_open_tag = On/" /etc/php5/apache2/php.ini
 RUN sed -i "s/error_reporting = .*$/error_reporting = E_ERROR | E_WARNING | E_PARSE/" /etc/php5/apache2/php.ini
  
 # Manually set up the apache environment variables
+ENV PATH=$PATH:/usr/local/bin/dolphin-bin
 ENV APACHE_RUN_USER www-data
 ENV APACHE_RUN_GROUP www-data
 ENV APACHE_LOG_DIR /var/log/apache2
@@ -38,13 +37,15 @@ EXPOSE 80
 EXPOSE 3306
 
 
+#Install DESeq2 
+RUN R -e 'source("http://bioconductor.org/biocLite.R"); biocLite("DESeq2");'
+
 # Copy site into place.
 ADD bin  /usr/local/bin
 RUN git clone https://github.com/UMMS-Biocore/dolphin-ui.git /var/www/html/dolphin
 RUN git clone https://github.com/UMMS-Biocore/dolphin-webservice.git /var/www/html/dolphin_webservice
 RUN git clone https://github.com/UMMS-Biocore/dolphin-bin /usr/local/bin/dolphin-bin
 RUN git clone https://github.com/UMMS-Biocore/dolphin-tools ${DOLPHIN_TOOLS_PATH}
-
 ADD install-phpmyadmin.sh /tmp/install-phpmyadmin.sh
 
 RUN cd /usr/local/bin/dolphin-bin/ZSI-2.1-a1 && python setup.py install
