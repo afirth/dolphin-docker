@@ -40,15 +40,7 @@ EXPOSE 3306
 #Install DESeq2 
 RUN R -e 'source("http://bioconductor.org/biocLite.R"); biocLite("DESeq2");'
 
-# Copy site into place.
-ADD bin  /usr/local/bin
-RUN git clone https://github.com/UMMS-Biocore/dolphin-ui.git /var/www/html/dolphin
-RUN git clone https://github.com/UMMS-Biocore/dolphin-webservice.git /var/www/html/dolphin_webservice
-RUN git clone https://github.com/UMMS-Biocore/dolphin-bin /usr/local/bin/dolphin-bin
-RUN git clone https://github.com/UMMS-Biocore/dolphin-tools ${DOLPHIN_TOOLS_PATH}
-ADD install-phpmyadmin.sh /tmp/install-phpmyadmin.sh
 
-RUN cd /usr/local/bin/dolphin-bin/ZSI-2.1-a1 && python setup.py install
 
 # Update the default apache site with the config we created.
 ADD apache-config.conf /etc/apache2/sites-enabled/000-default.conf
@@ -57,6 +49,7 @@ RUN echo "ServerName localhost" | sudo tee /etc/apache2/conf-available/fqdn.conf
 RUN a2enconf fqdn
 RUN echo "export DOLPHIN_TOOLS_PATH="${DOLPHIN_TOOLS_PATH} >> /etc/apache2/envvars
 
+ADD install-phpmyadmin.sh /tmp/install-phpmyadmin.sh
 # Install phpMyAdmin
 RUN chmod +x  /tmp/install-phpmyadmin.sh
 
@@ -72,3 +65,15 @@ RUN service mysql start \
 #RUN rm  /tmp/install-phpmyadmin.sh
 RUN sed -i "s#// \$cfg\['Servers'\]\[\$i\]\['AllowNoPassword'\] = TRUE;#\$cfg\['Servers'\]\[\$i\]\['AllowNoPassword'\] = TRUE;#g" /etc/phpmyadmin/config.inc.php 
  
+# Copy site into place.
+ENV GITUSER=nephantes
+ADD bin  /usr/local/bin
+RUN git clone https://github.com/${GITUSER}/dolphin-bin /usr/local/bin/dolphin-bin
+RUN cd /usr/local/bin/dolphin-bin/ZSI-2.1-a1 && python setup.py install
+RUN echo 'Dolphin Docker 0.02'
+RUN git clone https://github.com/${GITUSER}/dolphin-webservice.git /var/www/html/dolphin_webservice
+RUN git clone https://github.com/${GITUSER}/dolphin-tools ${DOLPHIN_TOOLS_PATH}
+RUN git clone https://github.com/${GITUSER}/dolphin-ui.git /var/www/html/dolphin
+RUN chown -R www-data /var/www/html/dolphin
+RUN chown -R www-data /var/www/html/dolphin
+
