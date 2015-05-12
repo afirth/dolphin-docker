@@ -30,7 +30,7 @@ ENV APACHE_RUN_GROUP www-data
 ENV APACHE_LOG_DIR /var/log/apache2
 ENV APACHE_LOCK_DIR /var/lock/apache2
 ENV APACHE_PID_FILE /var/run/apache2.pid
-ENV DOLPHIN_TOOLS_PATH=/usr/local/share/dolphin_tools
+ENV DOLPHIN_PARAMS_SECTION=Docker
 
 
 EXPOSE 80
@@ -47,7 +47,7 @@ ADD apache-config.conf /etc/apache2/sites-enabled/000-default.conf
 
 RUN echo "ServerName localhost" | sudo tee /etc/apache2/conf-available/fqdn.conf
 RUN a2enconf fqdn
-RUN echo "export DOLPHIN_TOOLS_PATH="${DOLPHIN_TOOLS_PATH} >> /etc/apache2/envvars
+RUN echo "export DOLPHIN_PARAMS_SECTION="${DOLPHIN_PARAMS_SECTION} >> /etc/apache2/envvars
 
 ADD install-phpmyadmin.sh /tmp/install-phpmyadmin.sh
 # Install phpMyAdmin
@@ -57,10 +57,9 @@ RUN service mysql start \
     service apache2 start; \
     sleep 5; \
     /tmp/install-phpmyadmin.sh; \
-    sleep 10; \
-    gunzip /usr/share/doc/phpmyadmin/examples/create_tables.sql.gz; \
-    mysql -u root < /usr/share/doc/phpmyadmin/examples/create_tables.sql;
-    #mysqladmin -u root shutdown
+    sleep 10 \ 
+    zcat /usr/share/doc/phpmyadmin/examples/create_tables.sql.gz|mysql -uroot
+RUN echo 'Dolphin Docker 0.06'
 
 #RUN rm  /tmp/install-phpmyadmin.sh
 RUN sed -i "s#// \$cfg\['Servers'\]\[\$i\]\['AllowNoPassword'\] = TRUE;#\$cfg\['Servers'\]\[\$i\]\['AllowNoPassword'\] = TRUE;#g" /etc/phpmyadmin/config.inc.php 
@@ -70,10 +69,10 @@ ENV GITUSER=nephantes
 ADD bin  /usr/local/bin
 RUN git clone https://github.com/${GITUSER}/dolphin-bin /usr/local/bin/dolphin-bin
 RUN cd /usr/local/bin/dolphin-bin/ZSI-2.1-a1 && python setup.py install
-RUN echo 'Dolphin Docker 0.02'
 RUN git clone https://github.com/${GITUSER}/dolphin-webservice.git /var/www/html/dolphin_webservice
-RUN git clone https://github.com/${GITUSER}/dolphin-tools ${DOLPHIN_TOOLS_PATH}
+RUN git clone https://github.com/${GITUSER}/dolphin-tools /usr/local/share/dolphin_tools
 RUN git clone https://github.com/${GITUSER}/dolphin-ui.git /var/www/html/dolphin
 RUN chown -R www-data /var/www/html/dolphin
-RUN chown -R www-data /var/www/html/dolphin
+RUN chown -R www-data /var/www/html/dolphin_webservice
+RUN chown -R www-data /usr/local/share/dolphin_tools
 
