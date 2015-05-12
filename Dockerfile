@@ -49,6 +49,7 @@ RUN echo "ServerName localhost" | sudo tee /etc/apache2/conf-available/fqdn.conf
 RUN a2enconf fqdn
 RUN echo "export DOLPHIN_PARAMS_SECTION="${DOLPHIN_PARAMS_SECTION} >> /etc/apache2/envvars
 
+RUN echo 'Dolphin Docker 0.11'
 ADD install-phpmyadmin.sh /tmp/install-phpmyadmin.sh
 # Install phpMyAdmin
 RUN chmod +x  /tmp/install-phpmyadmin.sh
@@ -57,9 +58,8 @@ RUN service mysql start \
     service apache2 start; \
     sleep 5; \
     /tmp/install-phpmyadmin.sh; \
-    sleep 10 \ 
+    sleep 10; \ 
     zcat /usr/share/doc/phpmyadmin/examples/create_tables.sql.gz|mysql -uroot
-RUN echo 'Dolphin Docker 0.06'
 
 #RUN rm  /tmp/install-phpmyadmin.sh
 RUN sed -i "s#// \$cfg\['Servers'\]\[\$i\]\['AllowNoPassword'\] = TRUE;#\$cfg\['Servers'\]\[\$i\]\['AllowNoPassword'\] = TRUE;#g" /etc/phpmyadmin/config.inc.php 

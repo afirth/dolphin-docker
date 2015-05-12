@@ -8,3 +8,6 @@ python3.4 /usr/local/bin/export_user_files.py
 service mysql start
 # start Apache in Foreground, that is needed for Docker
 apache2 -D FOREGROUND
+mkdir -p /export/pub
+chmod 777 /export/pub
+ln -s /export/pub /var/www/html/dolphin/public/.
