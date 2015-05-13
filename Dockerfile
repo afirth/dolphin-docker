@@ -49,7 +49,7 @@ RUN echo "ServerName localhost" | sudo tee /etc/apache2/conf-available/fqdn.conf
 RUN a2enconf fqdn
 RUN echo "export DOLPHIN_PARAMS_SECTION="${DOLPHIN_PARAMS_SECTION} >> /etc/apache2/envvars
 
-RUN echo 'Dolphin Docker 0.11'
+RUN echo 'Dolphin Docker 0.16'
 ADD install-phpmyadmin.sh /tmp/install-phpmyadmin.sh
 # Install phpMyAdmin
 RUN chmod +x  /tmp/install-phpmyadmin.sh
@@ -72,7 +72,7 @@ RUN cd /usr/local/bin/dolphin-bin/ZSI-2.1-a1 && python setup.py install
 RUN git clone https://github.com/${GITUSER}/dolphin-webservice.git /var/www/html/dolphin_webservice
 RUN git clone https://github.com/${GITUSER}/dolphin-tools /usr/local/share/dolphin_tools
 RUN git clone https://github.com/${GITUSER}/dolphin-ui.git /var/www/html/dolphin
-RUN chown -R www-data /var/www/html/dolphin
-RUN chown -R www-data /var/www/html/dolphin_webservice
-RUN chown -R www-data /usr/local/share/dolphin_tools
+RUN chown -R ${APACHE_RUN_USER}:${APACHE_RUN_GROUP} /var/www/html/dolphin
+RUN chown -R ${APACHE_RUN_USER}:${APACHE_RUN_GROUP} /var/www/html/dolphin_webservice
+RUN chown -R ${APACHE_RUN_USER}:${APACHE_RUN_GROUP} /usr/local/share/dolphin_tools
 
