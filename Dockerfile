@@ -7,10 +7,19 @@ RUN apt-get -y upgrade
 RUN apt-get dist-upgrade
  
 # Install apache, PHP, and supplimentary programs. curl and lynx-cur are for debugging the container.
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install apache2 libapache2-mod-php5 \
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install apache2 libapache2-mod-php5 php5-mcrypt\
                     php5-mysqlnd php5-gd php-pear php-apc php5-curl curl lynx-cur mysql-server \
                     libreadline-dev libsqlite3-dev libbz2-dev libssl-dev python python-dev \
-                    libmysqlclient-dev python-pip git expect default-jre r-base r-base-dev 
+                    libmysqlclient-dev python-pip git expect default-jre r-base r-base-dev \
+                    libxml2-dev software-properties-common 
+
+RUN add-apt-repository ppa:marutter/rrutter
+
+RUN apt-get update
+RUN apt-get -y upgrade
+
+RUN apt-get -y install r-base r-base-dev
+
 
 RUN pip install MySQL-python
 
@@ -39,7 +48,9 @@ EXPOSE 3306
 
 #Install DESeq2 
 RUN R -e 'source("http://bioconductor.org/biocLite.R"); biocLite("DESeq2");'
-
+RUN echo "r <- getOption('repos'); r['CRAN'] <- 'http://cran.us.r-project.org'; options(repos = r);" > ~/.Rprofile
+RUN R -e 'install.packages("ggplot2")'
+RUN R -e 'install.packages("gplots")'
 
 
 # Update the default apache site with the config we created.
@@ -55,20 +66,20 @@ RUN chmod -R 755 /var/www/.java
 RUN chown -R ${APACHE_RUN_USER}:${APACHE_RUN_GROUP} /var/www
 RUN echo "export JAVA_OPTS=\"-Djava.util.prefs.systemRoot=/var/www/.java Djava.util.prefs.userRoot=/var/www/.java/.userPrefs\"" >> /etc/apache2/envvars
 
-RUN echo 'Dolphin Docker 0.19'
-ADD install-phpmyadmin.sh /tmp/install-phpmyadmin.sh
+RUN pip install -U boto
+
+RUN echo 'Dolphin Docker 0.27'
 # Install phpMyAdmin
-RUN chmod +x  /tmp/install-phpmyadmin.sh
 
 RUN service mysql start \
     service apache2 start; \
-    sleep 5; \
-    /tmp/install-phpmyadmin.sh; \
-    sleep 10; \ 
+    DEBIAN_FRONTEND=noninteractive apt-get -y install phpmyadmin; \ 
     zcat /usr/share/doc/phpmyadmin/examples/create_tables.sql.gz|mysql -uroot
 
-#RUN rm  /tmp/install-phpmyadmin.sh
 RUN sed -i "s#// \$cfg\['Servers'\]\[\$i\]\['AllowNoPassword'\] = TRUE;#\$cfg\['Servers'\]\[\$i\]\['AllowNoPassword'\] = TRUE;#g" /etc/phpmyadmin/config.inc.php 
+RUN ln -s /etc/phpmyadmin/apache.conf /etc/apache2/conf-enabled/phpmyadmin.conf
+RUN php5enmod mcrypt
+
  
 # Copy site into place.
 ENV GITUSER=nephantes
@@ -81,4 +92,6 @@ RUN git clone https://github.com/${GITUSER}/dolphin-ui.git /var/www/html/dolphin
 RUN chown -R ${APACHE_RUN_USER}:${APACHE_RUN_GROUP} /var/www/html/dolphin
 RUN chown -R ${APACHE_RUN_USER}:${APACHE_RUN_GROUP} /var/www/html/dolphin_webservice
 RUN chown -R ${APACHE_RUN_USER}:${APACHE_RUN_GROUP} /usr/local/share/dolphin_tools
+
+RUN apt-get -y autoremove
 
