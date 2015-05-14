@@ -11,7 +11,7 @@ mysql -uroot -e "GRANT ALL PRIVILEGES on *.* TO 'bioinfo'@'%' IDENTIFIED BY 'bio
 mysql -uroot -e "SET PASSWORD FOR 'debian-sys-maint'@'localhost'  = PASSWORD('"${pass}"');"
 
 
-zcat /var/www/html/dolphin/db/alldb_28Apr2015.sql.gz | mysql -uroot 
+zcat /var/www/html/dolphin/db/biocoredb.sql.gz | mysql -uroot 
 
 zcat /usr/share/doc/phpmyadmin/examples/create_tables.sql.gz|mysql -uroot
 

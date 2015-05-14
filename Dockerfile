@@ -10,7 +10,8 @@ RUN apt-get dist-upgrade
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install apache2 libapache2-mod-php5 \
                     php5-mysqlnd php5-gd php-pear php-apc php5-curl curl lynx-cur mysql-server \
                     libreadline-dev libsqlite3-dev libbz2-dev libssl-dev python python-dev \
-                    libmysqlclient-dev python-pip git expect default-jre r-base r-base-dev 
+                    libmysqlclient-dev python-pip git expect default-jre r-base r-base-dev \
+                    libxml2-dev
 
 RUN pip install MySQL-python
 
@@ -55,7 +56,7 @@ RUN chmod -R 755 /var/www/.java
 RUN chown -R ${APACHE_RUN_USER}:${APACHE_RUN_GROUP} /var/www
 RUN echo "export JAVA_OPTS=\"-Djava.util.prefs.systemRoot=/var/www/.java Djava.util.prefs.userRoot=/var/www/.java/.userPrefs\"" >> /etc/apache2/envvars
 
-RUN echo 'Dolphin Docker 0.19'
+RUN echo 'Dolphin Docker 0.21'
 ADD install-phpmyadmin.sh /tmp/install-phpmyadmin.sh
 # Install phpMyAdmin
 RUN chmod +x  /tmp/install-phpmyadmin.sh
