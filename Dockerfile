@@ -49,7 +49,13 @@ RUN echo "ServerName localhost" | sudo tee /etc/apache2/conf-available/fqdn.conf
 RUN a2enconf fqdn
 RUN echo "export DOLPHIN_PARAMS_SECTION="${DOLPHIN_PARAMS_SECTION} >> /etc/apache2/envvars
 
-RUN echo 'Dolphin Docker 0.16'
+RUN mkdir -p /var/www/.java/.systemPrefs
+RUN mkdir /var/www/.java/.userPrefs
+RUN chmod -R 755 /var/www/.java
+RUN chown -R ${APACHE_RUN_USER}:${APACHE_RUN_GROUP} /var/www
+RUN echo "export JAVA_OPTS=\"-Djava.util.prefs.systemRoot=/var/www/.java Djava.util.prefs.userRoot=/var/www/.java/.userPrefs\"" >> /etc/apache2/envvars
+
+RUN echo 'Dolphin Docker 0.19'
 ADD install-phpmyadmin.sh /tmp/install-phpmyadmin.sh
 # Install phpMyAdmin
 RUN chmod +x  /tmp/install-phpmyadmin.sh
