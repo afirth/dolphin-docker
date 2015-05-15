@@ -10,7 +10,16 @@ RUN apt-get dist-upgrade
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install apache2 libapache2-mod-php5 \
                     php5-mysqlnd php5-gd php-pear php-apc php5-curl curl lynx-cur mysql-server \
                     libreadline-dev libsqlite3-dev libbz2-dev libssl-dev python python-dev \
-                    libmysqlclient-dev python-pip git expect default-jre r-base r-base-dev 
+                    libmysqlclient-dev python-pip git expect default-jre r-base r-base-dev \
+                    libxml2-dev software-properties-common
+
+RUN add-apt-repository ppa:marutter/rrutter
+
+RUN apt-get update
+RUN apt-get -y upgrade
+
+RUN apt-get -y install r-base r-base-dev
+
 
 RUN pip install MySQL-python
 
@@ -39,7 +48,9 @@ EXPOSE 3306
 
 #Install DESeq2 
 RUN R -e 'source("http://bioconductor.org/biocLite.R"); biocLite("DESeq2");'
-
+RUN echo "r <- getOption('repos'); r['CRAN'] <- 'http://cran.us.r-project.org'; options(repos = r);" > ~/.Rprofile
+RUN R -e 'install.packages("ggplot2")'
+RUN R -e 'install.packages("gplots")'
 
 
 # Update the default apache site with the config we created.
@@ -49,7 +60,13 @@ RUN echo "ServerName localhost" | sudo tee /etc/apache2/conf-available/fqdn.conf
 RUN a2enconf fqdn
 RUN echo "export DOLPHIN_PARAMS_SECTION="${DOLPHIN_PARAMS_SECTION} >> /etc/apache2/envvars
 
-RUN echo 'Dolphin Docker 0.16'
+RUN mkdir -p /var/www/.java/.systemPrefs
+RUN mkdir /var/www/.java/.userPrefs
+RUN chmod -R 755 /var/www/.java
+RUN chown -R ${APACHE_RUN_USER}:${APACHE_RUN_GROUP} /var/www
+RUN echo "export JAVA_OPTS=\"-Djava.util.prefs.systemRoot=/var/www/.java Djava.util.prefs.userRoot=/var/www/.java/.userPrefs\"" >> /etc/apache2/envvars
+
+RUN echo 'Dolphin Docker 0.21'
 ADD install-phpmyadmin.sh /tmp/install-phpmyadmin.sh
 # Install phpMyAdmin
 RUN chmod +x  /tmp/install-phpmyadmin.sh
@@ -75,4 +92,6 @@ RUN git clone https://github.com/${GITUSER}/dolphin-ui.git /var/www/html/dolphin
 RUN chown -R ${APACHE_RUN_USER}:${APACHE_RUN_GROUP} /var/www/html/dolphin
 RUN chown -R ${APACHE_RUN_USER}:${APACHE_RUN_GROUP} /var/www/html/dolphin_webservice
 RUN chown -R ${APACHE_RUN_USER}:${APACHE_RUN_GROUP} /usr/local/share/dolphin_tools
+
+RUN apt-get -y autoremove
 
