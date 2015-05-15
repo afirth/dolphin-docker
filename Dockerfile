@@ -11,7 +11,15 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install apache2 libapache2-mod-php
                     php5-mysqlnd php5-gd php-pear php-apc php5-curl curl lynx-cur mysql-server \
                     libreadline-dev libsqlite3-dev libbz2-dev libssl-dev python python-dev \
                     libmysqlclient-dev python-pip git expect default-jre r-base r-base-dev \
-                    libxml2-dev
+                    libxml2-dev software-properties-common
+
+RUN add-apt-repository ppa:marutter/rrutter
+
+RUN apt-get update
+RUN apt-get -y upgrade
+
+RUN apt-get -y install r-base r-base-dev
+
 
 RUN pip install MySQL-python
 
@@ -40,7 +48,9 @@ EXPOSE 3306
 
 #Install DESeq2 
 RUN R -e 'source("http://bioconductor.org/biocLite.R"); biocLite("DESeq2");'
-
+RUN echo "r <- getOption('repos'); r['CRAN'] <- 'http://cran.us.r-project.org'; options(repos = r);" > ~/.Rprofile
+RUN R -e 'install.packages("ggplot2")'
+RUN R -e 'install.packages("gplots")'
 
 
 # Update the default apache site with the config we created.
@@ -82,4 +92,6 @@ RUN git clone https://github.com/${GITUSER}/dolphin-ui.git /var/www/html/dolphin
 RUN chown -R ${APACHE_RUN_USER}:${APACHE_RUN_GROUP} /var/www/html/dolphin
 RUN chown -R ${APACHE_RUN_USER}:${APACHE_RUN_GROUP} /var/www/html/dolphin_webservice
 RUN chown -R ${APACHE_RUN_USER}:${APACHE_RUN_GROUP} /usr/local/share/dolphin_tools
+
+RUN apt-get -y autoremove
 
