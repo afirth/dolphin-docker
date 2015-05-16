@@ -68,7 +68,7 @@ RUN echo "export JAVA_OPTS=\"-Djava.util.prefs.systemRoot=/var/www/.java Djava.u
 
 RUN pip install -U boto
 
-RUN echo 'Dolphin Docker 0.27'
+RUN echo 'Dolphin Docker 0.28'
 # Install phpMyAdmin
 
 RUN service mysql start \
