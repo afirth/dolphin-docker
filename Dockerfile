@@ -7,7 +7,7 @@ RUN apt-get -y upgrade
 RUN apt-get dist-upgrade
  
 # Install apache, PHP, and supplimentary programs. curl and lynx-cur are for debugging the container.
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install apache2 libapache2-mod-php5 \
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install apache2 libapache2-mod-php5 php5-mcrypt\
                     php5-mysqlnd php5-gd php-pear php-apc php5-curl curl lynx-cur mysql-server \
                     libreadline-dev libsqlite3-dev libbz2-dev libssl-dev python python-dev \
                     libmysqlclient-dev python-pip git expect default-jre r-base r-base-dev \
@@ -66,27 +66,28 @@ RUN chmod -R 755 /var/www/.java
 RUN chown -R ${APACHE_RUN_USER}:${APACHE_RUN_GROUP} /var/www
 RUN echo "export JAVA_OPTS=\"-Djava.util.prefs.systemRoot=/var/www/.java Djava.util.prefs.userRoot=/var/www/.java/.userPrefs\"" >> /etc/apache2/envvars
 
-RUN echo 'Dolphin Docker 0.21'
-ADD install-phpmyadmin.sh /tmp/install-phpmyadmin.sh
+RUN pip install -U boto
+
 # Install phpMyAdmin
-RUN chmod +x  /tmp/install-phpmyadmin.sh
 
 RUN service mysql start \
     service apache2 start; \
-    sleep 5; \
-    /tmp/install-phpmyadmin.sh; \
-    sleep 10; \ 
+    DEBIAN_FRONTEND=noninteractive apt-get -y install phpmyadmin; \ 
     zcat /usr/share/doc/phpmyadmin/examples/create_tables.sql.gz|mysql -uroot
 
-#RUN rm  /tmp/install-phpmyadmin.sh
 RUN sed -i "s#// \$cfg\['Servers'\]\[\$i\]\['AllowNoPassword'\] = TRUE;#\$cfg\['Servers'\]\[\$i\]\['AllowNoPassword'\] = TRUE;#g" /etc/phpmyadmin/config.inc.php 
+RUN ln -s /etc/phpmyadmin/apache.conf /etc/apache2/conf-enabled/phpmyadmin.conf
+RUN php5enmod mcrypt
+
  
 # Copy site into place.
 ENV GITUSER=nephantes
 ADD bin  /usr/local/bin
 RUN git clone https://github.com/${GITUSER}/dolphin-bin /usr/local/bin/dolphin-bin
 RUN cd /usr/local/bin/dolphin-bin/ZSI-2.1-a1 && python setup.py install
+RUN cd /usr/local/bin/dolphin-bin/MACS-1.4.2 && python setup.py install
 RUN git clone https://github.com/${GITUSER}/dolphin-webservice.git /var/www/html/dolphin_webservice
+RUN echo 'Dolphin Docker 0.35'
 RUN git clone https://github.com/${GITUSER}/dolphin-tools /usr/local/share/dolphin_tools
 RUN git clone https://github.com/${GITUSER}/dolphin-ui.git /var/www/html/dolphin
 RUN chown -R ${APACHE_RUN_USER}:${APACHE_RUN_GROUP} /var/www/html/dolphin
