@@ -68,7 +68,6 @@ RUN echo "export JAVA_OPTS=\"-Djava.util.prefs.systemRoot=/var/www/.java Djava.u
 
 RUN pip install -U boto
 
-RUN echo 'Dolphin Docker 0.28'
 # Install phpMyAdmin
 
 RUN service mysql start \
@@ -86,7 +85,9 @@ ENV GITUSER=nephantes
 ADD bin  /usr/local/bin
 RUN git clone https://github.com/${GITUSER}/dolphin-bin /usr/local/bin/dolphin-bin
 RUN cd /usr/local/bin/dolphin-bin/ZSI-2.1-a1 && python setup.py install
+RUN cd /usr/local/bin/dolphin-bin/MACS-1.4.2 && python setup.py install
 RUN git clone https://github.com/${GITUSER}/dolphin-webservice.git /var/www/html/dolphin_webservice
+RUN echo 'Dolphin Docker 0.35'
 RUN git clone https://github.com/${GITUSER}/dolphin-tools /usr/local/share/dolphin_tools
 RUN git clone https://github.com/${GITUSER}/dolphin-ui.git /var/www/html/dolphin
 RUN chown -R ${APACHE_RUN_USER}:${APACHE_RUN_GROUP} /var/www/html/dolphin
