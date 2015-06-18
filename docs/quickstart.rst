@@ -49,14 +49,15 @@ This will prepare example genome and mysql database in /export directory that ar
 Starting mysql and web server
 ================
 
-'startup' command will also start mysql and apache web servers. i
+'startup' command will also start mysql and apache web servers.
 When you run dolphin-docker container. You need to start start using this command.
 
 To reach the applications on apache server please add your docker host ip address into /etc/hosts file 
 
 Ex:
 -----------------
-$echo ${DOCKER_HOST} 
+echo ${DOCKER_HOST} 
+
 tcp://192.168.59.103:2376
 
 /etc/hosts =>
