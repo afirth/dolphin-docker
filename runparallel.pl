@@ -23,10 +23,11 @@ sub main {
 
 	my $limit = IPC::ConcurrencyLimit->new(
 		type      => 'Flock', # that's also the default
-		max_procs => $args{concurrent},
-		path      => $args{lockpath}, # an option to the locking strategy
+		max_procs => $args{concurrent}, # how many locks to allow
+		path      => $args{lockpath}, # an option to the locking strategy. ConcurrencyLimits using the same lockpath share the limit
 	);
 	
+	# Try to get a lock. If it succeeds, run $cmd. Otherwise, sleep and try again.
 	# NOTE: when $limit goes out of scope, the lock is released
 	do {
 		my $id = $limit->get_lock();
@@ -42,8 +43,8 @@ sub main {
 			warn "PID $PID got none of the worker locks. Sleeping." if $args{verbose};
 			sleep($args{sleep});
 		}
-	# lock released with $limit going out of scope here
 	} until ( $id );
+	# lock released with $limit going out of scope here
 }
 
 sub getoptions {
@@ -83,6 +84,6 @@ The STDOUT and STDERR of COMMAND is discarded
 
 =head1 AUTHOR
 
-Alastair Firth github:@afirth
+Alastair Firth github @afirth
 
 =cut
