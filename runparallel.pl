@@ -81,7 +81,7 @@ sub getoptions {
 
 =head1 NAME
 
-runparallel 
+runparallel
 
 =head1 DESCRIPTION
 
@@ -92,15 +92,15 @@ Runs command in parallel with other commands, up to n concurrently. Sleeps until
   runparallel.pl --command='echo foo bar'
 
   runparallel.pl [--sleep=1] [--verbose] [--lockpath=/tmp/locks] [--concurrent=10] <--command=COMMAND>
-  
+
   --command	command to execute
   --concurrent	maximum procs to run. Default 10. Multiple scripts using different MAX_PROCS on the same lock dir is NOT supported.
   --lockpath	where to create the lock file. Default /tmp/locks 
   --sleep	seconds to sleep before trying to obtain a lock again. Default 1
   --verbose	print basic status messages to STDERR. Default False
-  
+
   Use the IPC::ConcurrencyLimit module to run at most --concurrent worker processes. Executes arguments as a call to system().
-  
+
 The STDOUT and STDERR of COMMAND is discarded
 
 =head1 EXAMPLE
